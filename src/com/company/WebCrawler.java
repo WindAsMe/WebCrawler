@@ -1,12 +1,13 @@
 package com.company;
 
 
-import com.sun.source.doctree.SeeTree;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.*;
 
 
@@ -21,7 +22,7 @@ public class WebCrawler {
 
     // Save the url which is marked.
     private static Set<String> set = new HashSet<>();
-
+    private static int count = 0;
     // DFS searching web
     private static void craweler(String url) {
         if (set.size() > 9 || set.contains(url))
@@ -30,9 +31,10 @@ public class WebCrawler {
             // Save the correlative url
             Queue<String> queue = new ArrayDeque<>();
             Document doc = Jsoup.connect(url).get();
+            count++;
             // mark
             set.add(url);
-            System.out.println("\nTitle: " + doc.title() + " url: " + url);
+            System.out.println("\nTitle: " + doc.title() + " URL: " + url + " Running times: " + count);
 
             // Element a including [href] attribute
             Elements links = doc.select("a[href]");
@@ -56,11 +58,21 @@ public class WebCrawler {
 
             System.out.println(("\nLinks: " + links.size()));
             for (Element link : links) {
-                String s = link.attr("abs:href") + trim(link.text(), 35);
-                System.out.println((" * " + s));
+                String s = link.attr("abs:href");
+                System.out.println((" * " + link.attr("abs:href") + trim(link.text(), 35)));
+
                 // Sort the valid url
-                if (s.substring(0, 4).equals("http") && )
-                    queue.add(s);
+                try {
+                    if (s.length() > 4 && s.substring(0, 4).equals("http")) {
+                        URL u = new URL(s);
+                        HttpURLConnection connection = (HttpURLConnection) u.openConnection();
+                        int state = connection.getResponseCode();
+                        if (state == 200)
+                            queue.add(s);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
 
             // Waiting 2.5s
