@@ -103,6 +103,7 @@ public class WebCrawlerDFS {
             try {
                 URL url = new URL(s);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                System.out.println(connection.toString());
                 return connection.getResponseCode() == 200;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -111,6 +112,7 @@ public class WebCrawlerDFS {
         } else
             return false;
     }
+
 
     public static void main(String[] args) {
         try {
@@ -129,6 +131,4 @@ public class WebCrawlerDFS {
             e.printStackTrace();
         }
     }
-
-
 }
