@@ -11,6 +11,8 @@ import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -26,6 +28,8 @@ public class WebCrawlerDFS {
     // Save the url which is marked
     private static Set<String> set = new HashSet<>();
     private static int count = 0;
+    private static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:MM:ss");
+
     // DFS searching web
     private static void craweler(String url, Connection c) {
         if (set.size() > 9 || set.contains(url))
@@ -72,8 +76,8 @@ public class WebCrawlerDFS {
             }
 
             if (!c.isClosed()) {
-                System.out.println("Insert INTO dfs_table (url, media, imports, links) VALUES (" + "\"" + url + "\"" + "," + media.size() + "," + imports.size() + "," + links.size() + ")");
-                statement.execute("Insert INTO dfs_table (url, media, imports, links) VALUES (" + "\"" + url + "\"" + "," + media.size() + "," + imports.size() + "," + links.size() + ")");
+                System.out.println("Insert INTO dfs_table (url, media, imports, links, time) VALUES (" + "\"" + url + "\"" + "," + media.size() + "," + imports.size() + "," + links.size() + "," + "\"" + format.format(System.currentTimeMillis()) + "\"" + ")");
+                statement.execute("Insert INTO dfs_table (url, media, imports, links, time) VALUES (" + "\"" + url + "\"" + "," + media.size() + "," + imports.size() + "," + links.size() + "," + "\"" + format.format(System.currentTimeMillis()) + "\"" + ")");
             }
 
             // Waiting 2.5s
@@ -103,7 +107,7 @@ public class WebCrawlerDFS {
             try {
                 URL url = new URL(s);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                System.out.println(connection.toString());
+                // System.out.println(connection.toString());
                 return connection.getResponseCode() == 200;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -125,7 +129,7 @@ public class WebCrawlerDFS {
             String database = "jdbc:mysql://localhost:3306/IRDB";
             Class.forName(driver);
             Connection c = DriverManager.getConnection(database, username, password);
-            craweler("https://www.baidu.com", c);
+            craweler("https://leetcode-cn.com", c);
             c.close();
         } catch (Exception e) {
             e.printStackTrace();
